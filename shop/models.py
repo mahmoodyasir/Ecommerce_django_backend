@@ -70,4 +70,4 @@ class Order(models.Model):
     discount = models.PositiveIntegerField()
     order_status = models.CharField(max_length=100, choices=ORDER_STATUS, default="Order Received")
     date = models.DateField(auto_now_add=True)
-    payment_complete = models.BooleanField(default=False, blank=True, null=True)
+    payment_complete = models.BooleanField(default=False)
