@@ -357,3 +357,44 @@ class AdminProfileView(views.APIView):
             response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
         return Response(response_msg)
 
+
+class AddCategory(views.APIView):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
+    def post(self, request):
+        serializers = CategorySerializer(data=request.data)
+
+        if serializers.is_valid():
+            serializers.save()
+            return Response({"error": False, "message": "Category is Added"})
+        return Response({"error": True, "message": "Something is wrong"})
+
+
+class DeleteCategory(views.APIView):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
+    def post(self, request):
+        category_product = Category.objects.get(id=request.data['id'])
+        category_product.delete()
+
+        return Response({"message": "Category Product is deleted"})
+
+
+class AddProduct(views.APIView):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
+    def post(self, request):
+        data = request.data
+        serializers = ProductSerializers(data=data, context={"request": request})
+
+        if serializers.is_valid(raise_exception=True):
+            cat_id = data["category"]
+            serializers.save()
+            Product.objects.update(
+                category=Category.objects.get(id=cat_id)
+            )
+            return Response({"error": False, "message": "Product is Added"})
+        return Response({"error": True, "message": "Something is wrong"})

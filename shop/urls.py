@@ -22,5 +22,8 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name="register"),
     path('admin_login/', CustomAuthToken.as_view(), name="admin_login"),
     path('admin_profile/', AdminProfileView.as_view(), name="admin_profile"),
+    path('add_category/', AddCategory.as_view(), name="add_category"),
+    path('delete_category/', DeleteCategory.as_view(), name="delete_category"),
+    path('add_product/', AddProduct.as_view(), name="add_product"),
 
 ]
