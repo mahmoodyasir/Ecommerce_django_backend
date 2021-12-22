@@ -393,8 +393,9 @@ class AddProduct(views.APIView):
         if serializers.is_valid(raise_exception=True):
             cat_id = data["category"]
             serializers.save()
-            Product.objects.update(
-                category=Category.objects.get(id=cat_id)
-            )
+            pro_obj = Product.objects.last()
+            pro_obj.category = Category.objects.get(id=cat_id)
+            pro_obj.save()
+
             return Response({"error": False, "message": "Product is Added"})
         return Response({"error": True, "message": "Something is wrong"})
