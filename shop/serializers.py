@@ -62,9 +62,32 @@ class CartProductSerializers(serializers.ModelSerializer):
         depth = 1
 
 
+# class ChoicesField(serializers.Field):
+#     def __init__(self, choices, **kwargs):
+#         self._choices = choices
+#         super(ChoicesField, self).__init__(**kwargs)
+#
+#     def to_representation(self, obj):
+#         return self._choices[obj]
+#
+#     def to_internal_value(self, data):
+#         return getattr(self._choices, data)
+
+
 class OrderSerializers(serializers.ModelSerializer):
+    # order_status = ChoicesField(choices=Order.ORDER_STATUS)
+
     class Meta:
         model = Order
         fields = "__all__"
         depth = 1
+
+
+class ChoiceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Choice
+        fields = "__all__"
+
+
 

@@ -168,7 +168,7 @@ class OldOrders(viewsets.ViewSet):
                 mobile=mobile,
                 email=email,
                 total=cart_obj.total,
-                discount=3
+                discount=0
             )
             response_msg = {"error": False, "message": "Your order is complete"}
         except:
@@ -399,3 +399,92 @@ class AddProduct(views.APIView):
 
             return Response({"error": False, "message": "Product is Added"})
         return Response({"error": True, "message": "Something is wrong"})
+
+
+class AllOrderView(viewsets.ViewSet):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
+    def list(self, request):
+        queryset = Order.objects.all().order_by("-id")
+        serializers = OrderSerializers(queryset, many=True)
+        all_data = []
+
+        for all_order in serializers.data:
+            cart_product = CartProduct.objects.filter(cart_id=all_order['cart']['id'])
+            cart_product_serializer = CartProductSerializers(cart_product, many=True)
+            all_order['cartproduct'] = cart_product_serializer.data
+
+            user_queryset = User.objects.filter(profile__cart=all_order['cart']['id'])
+            user_serializer = UserSerializer(user_queryset, many=True)
+            all_order['userdata'] = user_serializer.data
+            all_data.append(all_order)
+
+        return Response(all_data)
+
+    def retrieve(self, request, pk=None):
+        try:
+            query = Order.objects.get(id=pk)
+            serializers = OrderSerializers(query)
+            data = serializers.data
+            all_data = []
+            cart_product = CartProduct.objects.filter(cart_id=data['cart']['id'])
+            cart_product_serializer = CartProductSerializers(cart_product, many=True)
+            data["cartproduct"] = cart_product_serializer.data
+            all_data.append(data)
+            response_msg = {'err': False, "data": all_data}
+        except:
+            response_msg = {'err': True, "data": "No Data Found !! "}
+        return Response(response_msg)
+
+    def create(self, request):
+        try:
+            data = request.data
+            order_id = data['id']
+            payment_st = data['payment_complete']
+            order_st = data['order_list']
+            order_obj = Order.objects.get(id=order_id)
+            print(type(order_obj))
+
+            order_obj.order_list = Choice.objects.get(id=order_st)
+            if payment_st == "true":
+                order_obj.payment_complete = True
+            elif payment_st == "false":
+                order_obj.payment_complete = False
+            order_obj.save()
+
+            print(payment_st)
+            print(order_st)
+
+            # Order.objects.update(
+            #     payment_complete=payment_st,
+            #     order_list=order_st,
+            #     # order_obj.save()
+            # )
+
+
+            response_msg = {"error": False, "message": "Your order is Edited"}
+        except:
+            response_msg = {"error": True, "message": "Something is wrong ! "}
+
+        return Response(response_msg)
+
+
+class GetChoice(viewsets.ViewSet):
+
+    def list(self, request):
+        query = Choice.objects.all().order_by("-id")
+        serializers = ChoiceSerializer(query, many=True)
+        return Response(serializers.data)
+
+    def retrieve(self, request, pk=None):
+        query = Choice.objects.get(id=pk)
+        serializers = ChoiceSerializer(query)
+        serializers_data = serializers.data
+        all_data = []
+        order_status = Order.objects.filter(order_list_id=serializers_data['id'])
+        order_status_serializer = OrderSerializers(order_status, many=True)
+        serializers_data["orders"] = order_status_serializer.data
+        all_data.append(serializers_data)
+        return Response(all_data)
+
