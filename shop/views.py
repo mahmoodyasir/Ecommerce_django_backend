@@ -128,6 +128,11 @@ class OldOrders(viewsets.ViewSet):
 
     def list(self, request):
         query = Order.objects.filter(cart__customer=request.user.profile)
+
+        # temp = request.user.profile.prouser.id
+        # user = Profile.objects.get(prouser_id=temp)
+        # print(user)
+
         serializers = OrderSerializers(query, many=True)
         all_data = []
         for order in serializers.data:
@@ -402,8 +407,8 @@ class AddProduct(views.APIView):
 
 
 class AllOrderView(viewsets.ViewSet):
-    authentication_classes = [TokenAuthentication, ]
-    permission_classes = [IsAdminUser, ]
+    # authentication_classes = [TokenAuthentication, ]
+    # permission_classes = [IsAdminUser, ]
 
     def list(self, request):
         queryset = Order.objects.all().order_by("-id")
@@ -418,6 +423,11 @@ class AllOrderView(viewsets.ViewSet):
             user_queryset = User.objects.filter(profile__cart=all_order['cart']['id'])
             user_serializer = UserSerializer(user_queryset, many=True)
             all_order['userdata'] = user_serializer.data
+
+            Profile_queryset = Profile.objects.filter(cart=all_order['cart']['id'])
+            Profile_queryset_serializer = ProfileSerializers(Profile_queryset, many=True)
+            all_order['profile_user'] = Profile_queryset_serializer.data
+
             all_data.append(all_order)
 
         return Response(all_data)
@@ -431,6 +441,15 @@ class AllOrderView(viewsets.ViewSet):
             cart_product = CartProduct.objects.filter(cart_id=data['cart']['id'])
             cart_product_serializer = CartProductSerializers(cart_product, many=True)
             data["cartproduct"] = cart_product_serializer.data
+
+            user_queryset = User.objects.filter(profile__cart=data['cart']['id'])
+            user_serializer = UserSerializer(user_queryset, many=True)
+            data['userdata'] = user_serializer.data
+
+            Profile_queryset = Profile.objects.filter(cart=data['cart']['id'])
+            Profile_queryset_serializer = ProfileSerializers(Profile_queryset, many=True)
+            data['profile_user'] = Profile_queryset_serializer.data
+
             all_data.append(data)
             response_msg = {'err': False, "data": all_data}
         except:
@@ -455,13 +474,6 @@ class AllOrderView(viewsets.ViewSet):
 
             print(payment_st)
             print(order_st)
-
-            # Order.objects.update(
-            #     payment_complete=payment_st,
-            #     order_list=order_st,
-            #     # order_obj.save()
-            # )
-
 
             response_msg = {"error": False, "message": "Your order is Edited"}
         except:
@@ -488,3 +500,38 @@ class GetChoice(viewsets.ViewSet):
         all_data.append(serializers_data)
         return Response(all_data)
 
+
+class AnyUserOrder(viewsets.ViewSet):
+
+    def retrieve(self, request, pk=None):
+        users = Profile.objects.get(prouser_id=pk)
+        print(users)
+
+        # return Response("Testing")
+        query = Order.objects.filter(cart__customer=users)
+
+        # temp = request.user.profile.prouser.id
+
+        serializers = OrderSerializers(query, many=True)
+        all_data = []
+        for order in serializers.data:
+            cart_product = CartProduct.objects.filter(cart_id=order['cart']['id'])
+            cart_product_serializer = CartProductSerializers(cart_product, many=True)
+            order['cartproduct'] = cart_product_serializer.data
+            all_data.append(order)
+        return Response(all_data)
+
+
+class AdminDeleteProduct(viewsets.ViewSet):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
+    def destroy(self, request, pk=None):
+        try:
+            product_obj = Product.objects.get(id=pk)
+            product_obj.delete()
+            response_msg = {"error": False, "message": "Product is deleted"}
+        except:
+            response_msg = {"error": True, "message": "Something is wrong !!"}
+
+        return Response(response_msg)

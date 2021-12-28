@@ -6,8 +6,10 @@ route = routers.DefaultRouter()
 route.register("category", CategoryView, basename="CategoryView")
 route.register("cart", MyCart, basename="cart")
 route.register("orders", OldOrders, basename="orders")
+route.register("any_user_order", AnyUserOrder, basename="any_user_order")
 route.register("all_order", AllOrderView, basename="all_order")
 route.register("get_choice", GetChoice, basename="get_choice")
+route.register("product_delete", AdminDeleteProduct, basename="product_delete")
 
 urlpatterns = [
     path("", include(route.urls)),
