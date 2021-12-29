@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import generics, mixins, viewsets, views
+from rest_framework import generics, mixins, viewsets, views, status
 from rest_framework.response import Response
 
 from .models import *
@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -535,3 +536,25 @@ class AdminDeleteProduct(viewsets.ViewSet):
             response_msg = {"error": True, "message": "Something is wrong !!"}
 
         return Response(response_msg)
+
+
+class DataCount(views.APIView):
+    def get(self, request):
+        cart = Cart.objects.all().values()
+        users = Profile.objects.all().values()
+        profile = User.objects.all().values()
+        cartproduct = CartProduct.objects.all().values()
+        order = Order.objects.all().values()
+        product = Product.objects.all().values()
+        category = Category.objects.all().values()
+        return Response({'cart': cart,
+                             'users': users,
+                             'profile': profile,
+                         "cartproduct": cartproduct,
+                         "order": order,
+                         "product": product,
+                         "category": category},
+                             status=status.HTTP_200_OK)
+
+
+

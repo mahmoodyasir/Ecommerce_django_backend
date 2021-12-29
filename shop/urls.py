@@ -29,5 +29,6 @@ urlpatterns = [
     path('add_category/', AddCategory.as_view(), name="add_category"),
     path('delete_category/', DeleteCategory.as_view(), name="delete_category"),
     path('add_product/', AddProduct.as_view(), name="add_product"),
+    path('data_count/', DataCount.as_view(), name="data_count"),
 
 ]
