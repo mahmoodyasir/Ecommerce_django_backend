@@ -138,18 +138,18 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'https://mahmoodyasir.github.io/Ecommerce_React_Frontend',
-)
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'https://mahmoodyasir.github.io/Ecommerce_React_Frontend',
-]
+# CORS_ORIGIN_WHITELIST = (
+#     'http://localhost:3000',
+#     'http://localhost:3001',
+#     'https://mahmoodyasir.github.io/Ecommerce_React_Frontend',
+# )
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',
+#     'http://localhost:3001',
+#     'https://mahmoodyasir.github.io/Ecommerce_React_Frontend',
+# ]
 CORS_URLS_REGEX = r'^/api.*'
-# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
