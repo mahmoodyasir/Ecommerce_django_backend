@@ -10,6 +10,8 @@ route.register("any_user_order", AnyUserOrder, basename="any_user_order")
 route.register("all_order", AllOrderView, basename="all_order")
 route.register("get_choice", GetChoice, basename="get_choice")
 route.register("product_delete", AdminDeleteProduct, basename="product_delete")
+route.register("incomplete_order", IncompleteOrder, basename="incomplete_order")
+
 
 urlpatterns = [
     path("", include(route.urls)),
@@ -30,5 +32,10 @@ urlpatterns = [
     path('delete_category/', DeleteCategory.as_view(), name="delete_category"),
     path('add_product/', AddProduct.as_view(), name="add_product"),
     path('data_count/', DataCount.as_view(), name="data_count"),
+    path('admin_user/', AdminRegister.as_view(), name="admin_user"),
+    path('delete_admin_user/', DeleteAdminUser.as_view(), name="delete_admin_user"),
+    path('change_password/', ChangePassword.as_view(), name="change_password"),
+    path('user_profile/', UserProfileView.as_view(), name="user_profile"),
+    # path('incomplete_order/', IncompleteOrder.as_view(), name="incomplete_order"),
 
 ]

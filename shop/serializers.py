@@ -33,6 +33,19 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class AdminUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'email')
+        extra_kwargs = {"password": {"write_only": True, 'required': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_superuser(**validated_data)
+        Token.objects.create(user=user)
+        Profile.objects.create(prouser=user)
+        return user
+
+
 class ProfileSerializers(serializers.ModelSerializer):
     class Meta:
         model = Profile
@@ -49,6 +62,13 @@ class ProfileSerializers(serializers.ModelSerializer):
         return response
 
 
+class UserProfileSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = "__all__"
+        depth = 1
+
+
 class CartSerializers(serializers.ModelSerializer):
     class Meta:
         model = Cart
@@ -59,7 +79,7 @@ class CartProductSerializers(serializers.ModelSerializer):
     class Meta:
         model = CartProduct
         fields = "__all__"
-        depth = 1
+        depth = 3
 
 
 # class ChoicesField(serializers.Field):

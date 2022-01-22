@@ -408,8 +408,8 @@ class AddProduct(views.APIView):
 
 
 class AllOrderView(viewsets.ViewSet):
-    # authentication_classes = [TokenAuthentication, ]
-    # permission_classes = [IsAdminUser, ]
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
 
     def list(self, request):
         queryset = Order.objects.all().order_by("-id")
@@ -539,10 +539,14 @@ class AdminDeleteProduct(viewsets.ViewSet):
 
 
 class DataCount(views.APIView):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
     def get(self, request):
         cart = Cart.objects.all().values()
-        users = Profile.objects.all().values()
-        profile = User.objects.all().values()
+        users = Profile.objects.filter(prouser__is_superuser=False).values()
+        profile = User.objects.filter(is_superuser=False).values()
+        admin_profile = User.objects.filter(is_superuser=True).values()
         cartproduct = CartProduct.objects.all().values()
         order = Order.objects.all().values()
         product = Product.objects.all().values()
@@ -550,6 +554,7 @@ class DataCount(views.APIView):
         return Response({'cart': cart,
                              'users': users,
                              'profile': profile,
+                         'admin_profile': admin_profile,
                          "cartproduct": cartproduct,
                          "order": order,
                          "product": product,
@@ -557,4 +562,79 @@ class DataCount(views.APIView):
                              status=status.HTTP_200_OK)
 
 
+class AdminRegister(views.APIView):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
+    def post(self, request):
+        serializers = AdminUserSerializer(data=request.data)
+
+        if serializers.is_valid():
+            serializers.save()
+            return Response({"error": False, "message": f"User is created for '{serializers.data['username']}'"})
+        return Response({"error": True, "message": "Something is wrong"})
+
+
+class DeleteAdminUser(views.APIView):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
+    def post(self, request):
+        user = User.objects.get(id=request.data['id'])
+        user.delete()
+        response_msg = {"error": False, "message": "Admin User is deleted"}
+        return Response(response_msg)
+
+
+class ChangePassword(views.APIView):
+    permission_classes = [IsAuthenticated, ]
+    authentication_classes = [TokenAuthentication, ]
+
+    def post(self, request):
+        user = request.user
+        if user.check_password(request.data['old_pass']):
+            user.set_password(request.data['new_pass'])
+            user.save()
+            response_msg = {"message": True}
+            return Response(response_msg)
+        else:
+            response_msg = {"message": False}
+            return Response(response_msg)
+
+
+class UserProfileView(views.APIView):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
+    def get(self, request):
+        try:
+            query = Profile.objects.filter(prouser__is_superuser=False)
+            serializer = UserProfileSerializers(query, many=True)
+            response_msg = {"error": False, "data": serializer.data}
+        except:
+            response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
+        return Response(response_msg)
+
+
+class IncompleteOrder(viewsets.ViewSet):
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAdminUser, ]
+
+    def list(self, request):
+        try:
+            query = CartProduct.objects.filter(cart__complete=False)
+            serializer = CartProductSerializers(query, many=True)
+            response_msg = {"error": False, "data": serializer.data}
+        except:
+            response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
+        return Response(response_msg)
+
+    def retrieve(self, request, pk=None):
+        try:
+            query = CartProduct.objects.filter(cart__complete=False, cart__customer=pk)
+            serializer = CartProductSerializers(query, many=True)
+            response_msg = {"error": False, "data": serializer.data}
+        except:
+            response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
+        return Response(response_msg)
 
