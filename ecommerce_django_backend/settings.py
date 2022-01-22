@@ -138,10 +138,12 @@ STATICFILES_DIRS = [
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
     'http://localhost:3001',
+    'https://mahmoodyasir.github.io',
 )
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:3001',
+    'https://mahmoodyasir.github.io',
 ]
 CORS_URLS_REGEX = r'^/api.*'
 # CORS_ORIGIN_ALLOW_ALL = True
