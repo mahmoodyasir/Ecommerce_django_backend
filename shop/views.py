@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, mixins, viewsets, views, status
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import *
@@ -645,7 +647,14 @@ class IncompleteOrder(viewsets.ViewSet):
         return Response(response_msg)
 
 
+class DemoResponse(views.APIView):
+    def get(self, request):
+        return Response(True)
+
+
 class OnlinePayment(views.APIView):
+    # authentication_classes = [TokenAuthentication, ]
+    # permission_classes = [IsAuthenticated, ]
     def post(self, request):
         data = request.data
         cart_id = data['cartId']
@@ -656,29 +665,69 @@ class OnlinePayment(views.APIView):
         total = data['total']
         quantity = int(data['quantity'])
 
-        return Response('OK')
+        print(cart_id, address, name, email, mobile, total, quantity)
 
-        # store_id = settings.STORE_ID
-        # store_pass = settings.STORE_PASS
-        # mypayment = SSLCSession(sslc_is_sandbox=True, sslc_store_id=store_id, sslc_store_pass=store_pass)
-        #
-        # status_url = request.build_absolute_uri(reverse('status'))
-        # mypayment.set_urls(success_url=status_url, fail_url=status_url, cancel_url=status_url, ipn_url=status_url)
-        #
-        # mypayment.set_product_integration(total_amount=Decimal(total), currency='BDT',
-        #                                   product_category='User Product mobile', product_name='None',
-        #                                   num_of_item=quantity, shipping_method='online', product_profile='None')
-        #
-        # mypayment.set_customer_info(name=name, email=email, address1=address, address2='',
-        #                             city='', postcode='none', country='Bangladesh', phone=mobile)
-        #
-        # mypayment.set_shipping_info(shipping_to=email, address=address, city='',
-        #                             postcode='none', country='Bangladesh')
-        #
-        # mypayment.set_additional_values(value_a=cart_id, value_b='', value_c='', value_d='')
-        #
-        # response_data = mypayment.init_payment()
-        #
-        # print(response_data)
-        #
-        # return Response(response_data['GatewayPageURL'])
+        store_id = settings.STORE_ID
+        store_pass = settings.STORE_PASS
+        mypayment = SSLCSession(sslc_is_sandbox=True, sslc_store_id=store_id, sslc_store_pass=store_pass)
+
+        status_url = request.build_absolute_uri(reverse('status'))
+        mypayment.set_urls(success_url=status_url, fail_url=status_url, cancel_url=status_url, ipn_url=status_url)
+
+        mypayment.set_product_integration(total_amount=Decimal(total), currency='BDT',
+                                          product_category='User Product mobile', product_name='None',
+                                          num_of_item=quantity, shipping_method='online', product_profile='None')
+
+        mypayment.set_customer_info(name=name, email=email, address1=address, address2='',
+                                    city='', postcode='none', country='Bangladesh', phone=mobile)
+
+        mypayment.set_shipping_info(shipping_to=email, address=address, city='None',
+                                    postcode='none', country='Bangladesh')
+
+        mypayment.set_additional_values(value_a=cart_id, value_b=address, value_c=email, value_d=mobile)
+
+        response_data = mypayment.init_payment()
+
+        print(response_data)
+
+        return Response(response_data['GatewayPageURL'])
+
+
+@csrf_exempt
+@api_view(['POST'])
+def sslc_status(request):
+    if request.method == 'post' or request.method == 'POST':
+        payment_data = request.POST
+        print(payment_data)
+        status = payment_data['status']
+        if status == 'VALID':
+            cart_id = payment_data['value_a']
+            address = payment_data['value_b']
+            email = payment_data['value_c']
+            mobile = payment_data['value_d']
+            tran_id = payment_data['tran_id']
+            medium = payment_data['card_issuer']
+            cart_obj = Cart.objects.get(id=cart_id)
+            cart_obj.complete = True
+            cart_obj.save()
+            Order.objects.create(
+                cart=cart_obj,
+                address=address,
+                mobile=mobile,
+                email=email,
+                total=cart_obj.total,
+                discount=0,
+                order_list=Choice.objects.get(id=1),
+                payment_complete=True,
+                payment_type="online",
+                transaction_id=tran_id,
+                transaction_medium=medium
+            )
+            return redirect("http://localhost:3000/success")
+        elif status == "FAILED":
+            return redirect("http://localhost:3000/failed")
+
+
+def sslc_complete(request, val_id, tran_id, value_a, value_b, value_c, value_d):
+    pass
+

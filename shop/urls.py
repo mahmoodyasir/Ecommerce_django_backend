@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 from .views import *
+from .views import sslc_status, sslc_complete
 
 route = routers.DefaultRouter()
 route.register("category", CategoryView, basename="CategoryView")
@@ -36,7 +37,12 @@ urlpatterns = [
     path('delete_admin_user/', DeleteAdminUser.as_view(), name="delete_admin_user"),
     path('change_password/', ChangePassword.as_view(), name="change_password"),
     path('user_profile/', UserProfileView.as_view(), name="user_profile"),
+    path('demo_response/', DemoResponse.as_view(), name="demo_response"),
+
     path('online_payment/', OnlinePayment.as_view(), name="online_payment"),
+
+    path('sslc/status/', sslc_status, name='status'),
+    path('sslc/complete/<val_id>/<tran_id>/<value_a>/<value_b>/<value_c>/<value_d>/', sslc_complete, name='sslc_complete'),
     # path('incomplete_order/', IncompleteOrder.as_view(), name="incomplete_order"),
 
 ]
