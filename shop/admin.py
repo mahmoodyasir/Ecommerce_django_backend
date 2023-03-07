@@ -10,7 +10,7 @@ class ChoicesAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     search_fields = ['id', 'cart']
-    list_display = ['id', 'cart', 'mobile', 'address', 'order_list', 'payment_complete']
+    list_display = ['id', 'cart', 'mobile', 'address', 'order_list', 'payment_complete', 'payment_type', 'transaction_id', 'transaction_medium']
     list_per_page = 10
 
 

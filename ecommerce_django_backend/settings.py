@@ -156,12 +156,15 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 9,
+    'PAGE_SIZE': 12,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STORE_ID = 'yasir62b2f1060a96d'
+STORE_PASS = 'yasir62b2f1060a96d@ssl'
 
 django_heroku.settings(locals())

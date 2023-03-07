@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from model_utils import Choices
+# from model_utils import Choices
 
 
 class Profile(models.Model):
@@ -62,14 +62,14 @@ class Choice(models.Model):
 
 
 class Order(models.Model):
-    ORDER_STATUS = Choices(
-        ("Order Received", "Order Received"),
-        ("Order Processing", "Order Processing"),
-        ("On the way", "On the way"),
-        ("Order Completed", "Order Completed"),
-        ("Order Canceled", "Order Canceled"),
-        ("Order pending", "Order pending"),
-    )
+    # ORDER_STATUS = Choices(
+    #     ("Order Received", "Order Received"),
+    #     ("Order Processing", "Order Processing"),
+    #     ("On the way", "On the way"),
+    #     ("Order Completed", "Order Completed"),
+    #     ("Order Canceled", "Order Canceled"),
+    #     ("Order pending", "Order pending"),
+    # )
     cart = models.OneToOneField(Cart, on_delete=models.CASCADE)
     address = models.CharField(max_length=255)
     mobile = models.CharField(max_length=16)
@@ -80,6 +80,9 @@ class Order(models.Model):
     order_list = models.ForeignKey(Choice, on_delete=models.CASCADE, default=6)
     date = models.DateField(auto_now_add=True)
     payment_complete = models.BooleanField(default=False)
+    payment_type = models.CharField(max_length=200, default="offline")
+    transaction_id = models.CharField(max_length=255, null=True, blank=True)
+    transaction_medium = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"Order id=={self.id}==Complete=={self.cart.complete}==Customer=={self.cart.customer}"

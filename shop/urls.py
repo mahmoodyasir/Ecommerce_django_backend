@@ -36,6 +36,7 @@ urlpatterns = [
     path('delete_admin_user/', DeleteAdminUser.as_view(), name="delete_admin_user"),
     path('change_password/', ChangePassword.as_view(), name="change_password"),
     path('user_profile/', UserProfileView.as_view(), name="user_profile"),
+    path('online_payment/', OnlinePayment.as_view(), name="online_payment"),
     # path('incomplete_order/', IncompleteOrder.as_view(), name="incomplete_order"),
 
 ]

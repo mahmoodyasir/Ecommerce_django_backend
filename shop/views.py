@@ -11,6 +11,12 @@ from django.contrib.auth.models import User
 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+
+from sslcommerz_python.payment import SSLCSession
+from django.conf import settings
+from django.urls import reverse
+from decimal import Decimal
+
 from django.http import JsonResponse
 
 
@@ -31,7 +37,7 @@ class ProductView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retriev
 
 class CategoryView(viewsets.ViewSet):
     def list(self, request):
-        query = Category.objects.all().order_by("-id")
+        query = Category.objects.all().order_by("id")
         serializers = CategorySerializer(query, many=True)
         return Response(serializers.data)
 
@@ -638,3 +644,41 @@ class IncompleteOrder(viewsets.ViewSet):
             response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
         return Response(response_msg)
 
+
+class OnlinePayment(views.APIView):
+    def post(self, request):
+        data = request.data
+        cart_id = data['cartId']
+        address = data['address']
+        name = data['name']
+        email = data['email']
+        mobile = data['mobile']
+        total = data['total']
+        quantity = int(data['quantity'])
+
+        return Response('OK')
+
+        # store_id = settings.STORE_ID
+        # store_pass = settings.STORE_PASS
+        # mypayment = SSLCSession(sslc_is_sandbox=True, sslc_store_id=store_id, sslc_store_pass=store_pass)
+        #
+        # status_url = request.build_absolute_uri(reverse('status'))
+        # mypayment.set_urls(success_url=status_url, fail_url=status_url, cancel_url=status_url, ipn_url=status_url)
+        #
+        # mypayment.set_product_integration(total_amount=Decimal(total), currency='BDT',
+        #                                   product_category='User Product mobile', product_name='None',
+        #                                   num_of_item=quantity, shipping_method='online', product_profile='None')
+        #
+        # mypayment.set_customer_info(name=name, email=email, address1=address, address2='',
+        #                             city='', postcode='none', country='Bangladesh', phone=mobile)
+        #
+        # mypayment.set_shipping_info(shipping_to=email, address=address, city='',
+        #                             postcode='none', country='Bangladesh')
+        #
+        # mypayment.set_additional_values(value_a=cart_id, value_b='', value_c='', value_d='')
+        #
+        # response_data = mypayment.init_payment()
+        #
+        # print(response_data)
+        #
+        # return Response(response_data['GatewayPageURL'])
