@@ -697,7 +697,7 @@ class OnlinePayment(views.APIView):
 
         print(response_data)
 
-        return Response(response_data['GatewayPageURL'])
+        return Response(response_data)
 
 
 @csrf_exempt
