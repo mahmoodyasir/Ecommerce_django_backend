@@ -37,6 +37,7 @@ urlpatterns = [
     path('delete_admin_user/', DeleteAdminUser.as_view(), name="delete_admin_user"),
     path('change_password/', ChangePassword.as_view(), name="change_password"),
     path('user_profile/', UserProfileView.as_view(), name="user_profile"),
+    path('search_product/', NoPaginationProduct.as_view(), name="search_product"),
     path('demo_response/', DemoResponse.as_view(), name="demo_response"),
 
     path('online_payment/', OnlinePayment.as_view(), name="online_payment"),

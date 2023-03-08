@@ -37,6 +37,13 @@ class ProductView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Retriev
             return self.list(request)
 
 
+class NoPaginationProduct(views.APIView):
+    def get(self, request):
+        query = Product.objects.all()
+        serializers = ProductSerializers(query, many=True)
+        return Response(serializers.data)
+
+
 class CategoryView(viewsets.ViewSet):
     def list(self, request):
         query = Category.objects.all().order_by("id")
@@ -136,7 +143,7 @@ class OldOrders(viewsets.ViewSet):
     permission_classes = [IsAuthenticated, ]
 
     def list(self, request):
-        query = Order.objects.filter(cart__customer=request.user.profile)
+        query = Order.objects.filter(cart__customer=request.user.profile).order_by('-id')
 
         # temp = request.user.profile.prouser.id
         # user = Profile.objects.get(prouser_id=temp)
