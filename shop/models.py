@@ -32,6 +32,14 @@ class Product(models.Model):
         return self.title
 
 
+class WishList(models.Model):
+    wishedProduct = models.ManyToManyField(Product)
+    date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"wishlist id=={self.id}==Wished Product=={self.wishedProduct}"
+
+
 class Cart(models.Model):
     customer = models.ForeignKey(Profile, on_delete=models.CASCADE)
     total = models.PositiveIntegerField()

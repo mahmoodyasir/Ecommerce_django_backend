@@ -110,4 +110,12 @@ class ChoiceSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class WishListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = WishList
+        fields = "__all__"
+        depth = 1
+
+
 

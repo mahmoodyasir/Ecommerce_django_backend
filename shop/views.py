@@ -18,6 +18,7 @@ from sslcommerz_python.payment import SSLCSession
 from django.conf import settings
 from django.urls import reverse
 from decimal import Decimal
+from django.db.models import Q
 
 from django.http import JsonResponse
 
@@ -657,6 +658,26 @@ class IncompleteOrder(viewsets.ViewSet):
 class DemoResponse(views.APIView):
     def get(self, request):
         return Response(True)
+
+
+class AlreadyAddedProductResponse(views.APIView):
+    # permission_classes = [IsAuthenticated, ]
+    # authentication_classes = [TokenAuthentication, ]
+
+    def post(self, request):
+        data = request.data
+        print(data)
+        cartId = data["cartId"]
+        productId = data["productId"]
+        query = CartProduct.objects.filter(cart_id=cartId, product=productId)
+
+        if query.exists():
+            serializer = CartProductSerializers(query, many=True)
+            response_msg = {"status": True, "cartdata": serializer.data}
+            return Response(response_msg)
+        else:
+            response_msg = {"status": False, "cartdata": None}
+            return Response(response_msg)
 
 
 class OnlinePayment(views.APIView):

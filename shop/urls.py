@@ -39,6 +39,7 @@ urlpatterns = [
     path('user_profile/', UserProfileView.as_view(), name="user_profile"),
     path('search_product/', NoPaginationProduct.as_view(), name="search_product"),
     path('demo_response/', DemoResponse.as_view(), name="demo_response"),
+    path('checkproduct/', AlreadyAddedProductResponse.as_view(), name="checkproduct"),
 
     path('online_payment/', OnlinePayment.as_view(), name="online_payment"),
 
