@@ -14,6 +14,12 @@ class OrderAdmin(admin.ModelAdmin):
     list_per_page = 10
 
 
+class CategoryAdmin(admin.ModelAdmin):
+    search_fields = ['id', 'title']
+    list_display = ['id', 'title']
+    list_per_page = 10
+
+
 class WishListAdmin(admin.ModelAdmin):
     search_fields = ['id', 'wishedProduct']
     list_display = ['id', 'date']
@@ -21,7 +27,7 @@ class WishListAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Profile)
-admin.site.register(Category)
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product)
 admin.site.register(Cart)
 admin.site.register(CartProduct)

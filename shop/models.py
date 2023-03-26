@@ -33,11 +33,12 @@ class Product(models.Model):
 
 
 class WishList(models.Model):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True)
     wishedProduct = models.ManyToManyField(Product)
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"wishlist id=={self.id}==Wished Product=={self.wishedProduct}"
+        return f"user=={self.user}==wishlist id=={self.id}==Wished Product=={self.wishedProduct}"
 
 
 class Cart(models.Model):

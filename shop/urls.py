@@ -12,6 +12,7 @@ route.register("all_order", AllOrderView, basename="all_order")
 route.register("get_choice", GetChoice, basename="get_choice")
 route.register("product_delete", AdminDeleteProduct, basename="product_delete")
 route.register("incomplete_order", IncompleteOrder, basename="incomplete_order")
+route.register("wishlist", WishListData, basename="wishlist")
 
 
 urlpatterns = [

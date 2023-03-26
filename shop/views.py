@@ -56,8 +56,10 @@ class CategoryView(viewsets.ViewSet):
         serializers = CategorySerializer(query)
         serializers_data = serializers.data
         all_data = []
-        category_products = Product.objects.filter(category_id=serializers_data['id'])
-        category_products_serializer = ProductSerializers(category_products, many=True)
+        category_products = Product.objects.filter(
+            category_id=serializers_data['id'])
+        category_products_serializer = ProductSerializers(
+            category_products, many=True)
         serializers_data["category_products"] = category_products_serializer.data
         all_data.append(serializers_data)
         return Response(all_data)
@@ -73,7 +75,8 @@ class ProfileView(views.APIView):
             serializer = ProfileSerializers(query)
             response_msg = {"error": False, "data": serializer.data}
         except:
-            response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
+            response_msg = {"error": True,
+                            "message": "Something is wrong !! Try again....."}
         return Response(response_msg)
 
 
@@ -100,7 +103,8 @@ class UserDataUpdate(views.APIView):
 
             response_msg = {"error": False, "message": "User Data is Updated"}
         except:
-            response_msg = {"error": True, "message": "User Data is not update !! Try Again ...."}
+            response_msg = {
+                "error": True, "message": "User Data is not update !! Try Again ...."}
         return Response(response_msg)
 
 
@@ -114,12 +118,15 @@ class ProfileImageUpdate(views.APIView):
             data = request.data
             query = Profile.objects.get(prouser=user)
 
-            serializers = ProfileSerializers(query, data=data, context={"request": request})
+            serializers = ProfileSerializers(
+                query, data=data, context={"request": request})
             serializers.is_valid(raise_exception=True)
             serializers.save()
-            response_msg = {"error": False, "message": "Profile Image Updated !!"}
+            response_msg = {"error": False,
+                            "message": "Profile Image Updated !!"}
         except:
-            response_msg = {"error": True, "message": "Profile Image not Update !! Try Again ...."}
+            response_msg = {
+                "error": True, "message": "Profile Image not Update !! Try Again ...."}
         return Response(response_msg)
 
 
@@ -133,7 +140,8 @@ class MyCart(viewsets.ViewSet):
         all_data = []
         for cart in serializers.data:
             cart_product = CartProduct.objects.filter(cart=cart['id'])
-            cart_product_serializer = CartProductSerializers(cart_product, many=True)
+            cart_product_serializer = CartProductSerializers(
+                cart_product, many=True)
             cart["cartproduct"] = cart_product_serializer.data
             all_data.append(cart)
         return Response(all_data)
@@ -144,7 +152,8 @@ class OldOrders(viewsets.ViewSet):
     permission_classes = [IsAuthenticated, ]
 
     def list(self, request):
-        query = Order.objects.filter(cart__customer=request.user.profile).order_by('-id')
+        query = Order.objects.filter(
+            cart__customer=request.user.profile).order_by('-id')
 
         # temp = request.user.profile.prouser.id
         # user = Profile.objects.get(prouser_id=temp)
@@ -153,8 +162,10 @@ class OldOrders(viewsets.ViewSet):
         serializers = OrderSerializers(query, many=True)
         all_data = []
         for order in serializers.data:
-            cart_product = CartProduct.objects.filter(cart_id=order['cart']['id'])
-            cart_product_serializer = CartProductSerializers(cart_product, many=True)
+            cart_product = CartProduct.objects.filter(
+                cart_id=order['cart']['id'])
+            cart_product_serializer = CartProductSerializers(
+                cart_product, many=True)
             order['cartproduct'] = cart_product_serializer.data
             all_data.append(order)
         return Response(all_data)
@@ -165,8 +176,10 @@ class OldOrders(viewsets.ViewSet):
             serializers = OrderSerializers(query)
             data = serializers.data
             all_data = []
-            cartproduct = CartProduct.objects.filter(cart_id=data['cart']['id'])
-            cartproduct_serializer = CartProductSerializers(cartproduct, many=True)
+            cartproduct = CartProduct.objects.filter(
+                cart_id=data['cart']['id'])
+            cartproduct_serializer = CartProductSerializers(
+                cartproduct, many=True)
             data["cartproduct"] = cartproduct_serializer.data
             all_data.append(data)
             response_msg = {'err': False, "data": all_data}
@@ -192,7 +205,8 @@ class OldOrders(viewsets.ViewSet):
                 total=cart_obj.total,
                 discount=0
             )
-            response_msg = {"error": False, "message": "Your order is complete"}
+            response_msg = {"error": False,
+                            "message": "Your order is complete"}
         except:
             response_msg = {"error": True, "message": "Something is wrong ! "}
 
@@ -218,13 +232,16 @@ class AddtoCart(views.APIView):
     def post(self, request):
         product_id = request.data['id']
         product_obj = Product.objects.get(id=product_id)
-        cart_cart = Cart.objects.filter(customer=request.user.profile).filter(complete=False).first()
-        cart_product_obj = CartProduct.objects.filter(product__id=product_id).first()
+        cart_cart = Cart.objects.filter(
+            customer=request.user.profile).filter(complete=False).first()
+        cart_product_obj = CartProduct.objects.filter(
+            product__id=product_id).first()
 
         try:
             if cart_cart:
                 print("OLD CART")
-                this_product_in_cart = cart_cart.cartproduct_set.filter(product=product_obj)
+                this_product_in_cart = cart_cart.cartproduct_set.filter(
+                    product=product_obj)
                 if this_product_in_cart.exists():
                     cart_product_uct = CartProduct.objects.filter(product=product_obj).filter(
                         cart__complete=False).first()
@@ -250,7 +267,8 @@ class AddtoCart(views.APIView):
                     total=0,
                     complete=False
                 )
-                new_cart = Cart.objects.filter(customer=request.user.profile).filter(complete=False).first()
+                new_cart = Cart.objects.filter(
+                    customer=request.user.profile).filter(complete=False).first()
                 cart_product_new = CartProduct.objects.create(
                     cart=new_cart,
                     price=product_obj.selling_price,
@@ -260,10 +278,12 @@ class AddtoCart(views.APIView):
                 cart_product_new.product.add(product_obj)
                 new_cart.total += product_obj.selling_price
                 new_cart.save()
-            response_msg = {"error": False, "message": "Product is added to cart"}
+            response_msg = {"error": False,
+                            "message": "Product is added to cart"}
 
         except:
-            response_msg = {"error": True, "message": "Product is not added to cart !! Try Again"}
+            response_msg = {
+                "error": True, "message": "Product is not added to cart !! Try Again"}
 
         return Response(response_msg)
 
@@ -300,7 +320,7 @@ class DecreaseCart(views.APIView):
         cart_product.subtotal -= cart_product.price
         cart_product.save()
 
-        if cart_product.quantity==0:
+        if cart_product.quantity == 0:
             cart_product.delete()
 
         cart_obj.total -= cart_product.price
@@ -351,7 +371,8 @@ class RegisterView(views.APIView):
 class CustomAuthToken(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer = self.serializer_class(
+            data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         if user.is_staff:
@@ -376,7 +397,8 @@ class AdminProfileView(views.APIView):
             serializer = ProfileSerializers(query)
             response_msg = {"error": False, "data": serializer.data}
         except:
-            response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
+            response_msg = {"error": True,
+                            "message": "Something is wrong !! Try again....."}
         return Response(response_msg)
 
 
@@ -410,7 +432,8 @@ class AddProduct(views.APIView):
 
     def post(self, request):
         data = request.data
-        serializers = ProductSerializers(data=data, context={"request": request})
+        serializers = ProductSerializers(
+            data=data, context={"request": request})
 
         if serializers.is_valid(raise_exception=True):
             cat_id = data["category"]
@@ -433,16 +456,21 @@ class AllOrderView(viewsets.ViewSet):
         all_data = []
 
         for all_order in serializers.data:
-            cart_product = CartProduct.objects.filter(cart_id=all_order['cart']['id'])
-            cart_product_serializer = CartProductSerializers(cart_product, many=True)
+            cart_product = CartProduct.objects.filter(
+                cart_id=all_order['cart']['id'])
+            cart_product_serializer = CartProductSerializers(
+                cart_product, many=True)
             all_order['cartproduct'] = cart_product_serializer.data
 
-            user_queryset = User.objects.filter(profile__cart=all_order['cart']['id'])
+            user_queryset = User.objects.filter(
+                profile__cart=all_order['cart']['id'])
             user_serializer = UserSerializer(user_queryset, many=True)
             all_order['userdata'] = user_serializer.data
 
-            Profile_queryset = Profile.objects.filter(cart=all_order['cart']['id'])
-            Profile_queryset_serializer = ProfileSerializers(Profile_queryset, many=True)
+            Profile_queryset = Profile.objects.filter(
+                cart=all_order['cart']['id'])
+            Profile_queryset_serializer = ProfileSerializers(
+                Profile_queryset, many=True)
             all_order['profile_user'] = Profile_queryset_serializer.data
 
             all_data.append(all_order)
@@ -455,16 +483,20 @@ class AllOrderView(viewsets.ViewSet):
             serializers = OrderSerializers(query)
             data = serializers.data
             all_data = []
-            cart_product = CartProduct.objects.filter(cart_id=data['cart']['id'])
-            cart_product_serializer = CartProductSerializers(cart_product, many=True)
+            cart_product = CartProduct.objects.filter(
+                cart_id=data['cart']['id'])
+            cart_product_serializer = CartProductSerializers(
+                cart_product, many=True)
             data["cartproduct"] = cart_product_serializer.data
 
-            user_queryset = User.objects.filter(profile__cart=data['cart']['id'])
+            user_queryset = User.objects.filter(
+                profile__cart=data['cart']['id'])
             user_serializer = UserSerializer(user_queryset, many=True)
             data['userdata'] = user_serializer.data
 
             Profile_queryset = Profile.objects.filter(cart=data['cart']['id'])
-            Profile_queryset_serializer = ProfileSerializers(Profile_queryset, many=True)
+            Profile_queryset_serializer = ProfileSerializers(
+                Profile_queryset, many=True)
             data['profile_user'] = Profile_queryset_serializer.data
 
             all_data.append(data)
@@ -511,7 +543,8 @@ class GetChoice(viewsets.ViewSet):
         serializers = ChoiceSerializer(query)
         serializers_data = serializers.data
         all_data = []
-        order_status = Order.objects.filter(order_list_id=serializers_data['id'])
+        order_status = Order.objects.filter(
+            order_list_id=serializers_data['id'])
         order_status_serializer = OrderSerializers(order_status, many=True)
         serializers_data["orders"] = order_status_serializer.data
         all_data.append(serializers_data)
@@ -532,8 +565,10 @@ class AnyUserOrder(viewsets.ViewSet):
         serializers = OrderSerializers(query, many=True)
         all_data = []
         for order in serializers.data:
-            cart_product = CartProduct.objects.filter(cart_id=order['cart']['id'])
-            cart_product_serializer = CartProductSerializers(cart_product, many=True)
+            cart_product = CartProduct.objects.filter(
+                cart_id=order['cart']['id'])
+            cart_product_serializer = CartProductSerializers(
+                cart_product, many=True)
             order['cartproduct'] = cart_product_serializer.data
             all_data.append(order)
         return Response(all_data)
@@ -568,14 +603,14 @@ class DataCount(views.APIView):
         product = Product.objects.all().values()
         category = Category.objects.all().values()
         return Response({'cart': cart,
-                             'users': users,
-                             'profile': profile,
+                         'users': users,
+                         'profile': profile,
                          'admin_profile': admin_profile,
                          "cartproduct": cartproduct,
                          "order": order,
                          "product": product,
                          "category": category},
-                             status=status.HTTP_200_OK)
+                        status=status.HTTP_200_OK)
 
 
 class AdminRegister(views.APIView):
@@ -628,7 +663,8 @@ class UserProfileView(views.APIView):
             serializer = UserProfileSerializers(query, many=True)
             response_msg = {"error": False, "data": serializer.data}
         except:
-            response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
+            response_msg = {"error": True,
+                            "message": "Something is wrong !! Try again....."}
         return Response(response_msg)
 
 
@@ -642,16 +678,19 @@ class IncompleteOrder(viewsets.ViewSet):
             serializer = CartProductSerializers(query, many=True)
             response_msg = {"error": False, "data": serializer.data}
         except:
-            response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
+            response_msg = {"error": True,
+                            "message": "Something is wrong !! Try again....."}
         return Response(response_msg)
 
     def retrieve(self, request, pk=None):
         try:
-            query = CartProduct.objects.filter(cart__complete=False, cart__customer=pk)
+            query = CartProduct.objects.filter(
+                cart__complete=False, cart__customer=pk)
             serializer = CartProductSerializers(query, many=True)
             response_msg = {"error": False, "data": serializer.data}
         except:
-            response_msg = {"error": True, "message": "Something is wrong !! Try again....."}
+            response_msg = {"error": True,
+                            "message": "Something is wrong !! Try again....."}
         return Response(response_msg)
 
 
@@ -661,8 +700,8 @@ class DemoResponse(views.APIView):
 
 
 class AlreadyAddedProductResponse(views.APIView):
-    # permission_classes = [IsAuthenticated, ]
-    # authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAuthenticated, ]
+    authentication_classes = [TokenAuthentication, ]
 
     def post(self, request):
         data = request.data
@@ -678,6 +717,66 @@ class AlreadyAddedProductResponse(views.APIView):
         else:
             response_msg = {"status": False, "cartdata": None}
             return Response(response_msg)
+
+
+# class AddToWishList(views.APIView):
+#     # permission_classes = [IsAuthenticated, ]
+#     # authentication_classes = [TokenAuthentication, ]
+#
+#     def post(self, request):
+#         user = request.user
+#         data = request.data
+
+
+class WishListData(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated, ]
+    authentication_classes = [TokenAuthentication, ]
+
+    def list(self, request):
+        query = WishList.objects.filter(user=request.user.profile)
+        serializers = WishListSerializer(query, many=True)
+        return Response(serializers.data)
+
+    def create(self, request):
+        data = request.data
+        product_id = data['id']
+        query = WishList.objects.filter(user=request.user.profile)
+        product_obj = Product.objects.get(id=product_id)
+
+        if query.exists():
+            try:
+                wishlist_obj = WishList.objects.get(user=request.user.profile)
+                wishlist_obj.wishedProduct.add(product_obj)
+                response_msg = {"error": False,
+                                "message": "Product Added to Wishlist"}
+            except:
+                response_msg = {"error": True,
+                                "message": "Something Went Wromg !!"}
+
+            return Response(response_msg)
+        else:
+            try:
+                new_wishlist = WishList.objects.create(
+                    user=request.user.profile,
+                )
+                new_wishlist.wishedProduct.add(product_obj)
+                response_msg = {"error": False, "message": "Product Added to Wishlist"}
+            except:
+                response_msg = {"error": True, "message": "Something Went Wrong !!"}
+
+            return Response(response_msg)
+
+    def destroy(self, request, pk=None):
+
+        try:
+            wishlist_obj = WishList.objects.get(user=request.user.profile)
+            product_obj = Product.objects.get(id=pk)
+            wishlist_obj.wishedProduct.remove(product_obj)
+            response_msg = {"error": False, "message": "Product Deleted"}
+        except:
+            response_msg = {"error": True, "message": "Something Went Wrong !!"}
+
+        return Response(response_msg)
 
 
 class OnlinePayment(views.APIView):
@@ -697,10 +796,12 @@ class OnlinePayment(views.APIView):
 
         store_id = settings.STORE_ID
         store_pass = settings.STORE_PASS
-        mypayment = SSLCSession(sslc_is_sandbox=True, sslc_store_id=store_id, sslc_store_pass=store_pass)
+        mypayment = SSLCSession(
+            sslc_is_sandbox=True, sslc_store_id=store_id, sslc_store_pass=store_pass)
 
         status_url = request.build_absolute_uri(reverse('status'))
-        mypayment.set_urls(success_url=status_url, fail_url=status_url, cancel_url=status_url, ipn_url=status_url)
+        mypayment.set_urls(success_url=status_url, fail_url=status_url,
+                           cancel_url=status_url, ipn_url=status_url)
 
         mypayment.set_product_integration(total_amount=Decimal(total), currency='BDT',
                                           product_category='User Product mobile', product_name='None',
@@ -712,7 +813,8 @@ class OnlinePayment(views.APIView):
         mypayment.set_shipping_info(shipping_to=email, address=address, city='None',
                                     postcode='none', country='Bangladesh')
 
-        mypayment.set_additional_values(value_a=cart_id, value_b=address, value_c=email, value_d=mobile)
+        mypayment.set_additional_values(
+            value_a=cart_id, value_b=address, value_c=email, value_d=mobile)
 
         response_data = mypayment.init_payment()
 
@@ -758,4 +860,3 @@ def sslc_status(request):
 
 def sslc_complete(request, val_id, tran_id, value_a, value_b, value_c, value_d):
     pass
-
