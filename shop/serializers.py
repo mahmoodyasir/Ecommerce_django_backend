@@ -110,12 +110,19 @@ class ChoiceSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserExcludeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        exclude = ('prouser',)
+
+
 class WishListSerializer(serializers.ModelSerializer):
+    user = UserExcludeSerializer()
 
     class Meta:
         model = WishList
         fields = "__all__"
-        depth = 1
+        depth = 2
 
 
 
