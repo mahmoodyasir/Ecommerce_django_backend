@@ -840,22 +840,26 @@ def sslc_status(request):
             cart_obj = Cart.objects.get(id=cart_id)
             cart_obj.complete = True
             cart_obj.save()
-            Order.objects.create(
-                cart=cart_obj,
-                address=address,
-                mobile=mobile,
-                email=email,
-                total=cart_obj.total,
-                discount=0,
-                order_list=Choice.objects.get(id=1),
-                payment_complete=True,
-                payment_type="online",
-                transaction_id=tran_id,
-                transaction_medium=medium
-            )
-            return redirect("http://localhost:3000/success")
+
+            if Order.objects.filter(cart=cart_obj).exists():
+                return redirect("https://bdmobileshop.netlify.app/success")
+            else:
+                Order.objects.create(
+                    cart=cart_obj,
+                    address=address,
+                    mobile=mobile,
+                    email=email,
+                    total=cart_obj.total,
+                    discount=0,
+                    order_list=Choice.objects.get(id=1),
+                    payment_complete=True,
+                    payment_type="online",
+                    transaction_id=tran_id,
+                    transaction_medium=medium
+                )
+                return redirect("https://bdmobileshop.netlify.app/success")
         elif status == "FAILED":
-            return redirect("http://localhost:3000/failed")
+            return redirect("https://bdmobileshop.netlify.app/failed")
 
 
 def sslc_complete(request, val_id, tran_id, value_a, value_b, value_c, value_d):

@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
-import django_heroku
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -167,4 +166,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STORE_ID = 'yasir62b2f1060a96d'
 STORE_PASS = 'yasir62b2f1060a96d@ssl'
 
-django_heroku.settings(locals())

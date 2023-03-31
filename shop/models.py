@@ -79,7 +79,7 @@ class Order(models.Model):
     #     ("Order Canceled", "Order Canceled"),
     #     ("Order pending", "Order pending"),
     # )
-    cart = models.OneToOneField(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, unique=False)
     address = models.CharField(max_length=255)
     mobile = models.CharField(max_length=16)
     email = models.CharField(max_length=200)
