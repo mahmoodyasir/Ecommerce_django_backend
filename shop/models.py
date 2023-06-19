@@ -6,6 +6,7 @@ from django.db import models
 class Profile(models.Model):
     prouser = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='static/images/customers', null=True, blank=True)
+    profileImageUrl = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.prouser.username
@@ -24,6 +25,7 @@ class Product(models.Model):
     date = models.DateField(auto_now_add=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
     image = models.ImageField(upload_to='static/images/products', null=True, blank=True)
+    productImageUrl = models.CharField(max_length=255, null=True, blank=True)
     market_price = models.PositiveIntegerField()
     selling_price = models.PositiveIntegerField()
     description = models.TextField()

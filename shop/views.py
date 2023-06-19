@@ -232,10 +232,8 @@ class AddtoCart(views.APIView):
     def post(self, request):
         product_id = request.data['id']
         product_obj = Product.objects.get(id=product_id)
-        cart_cart = Cart.objects.filter(
-            customer=request.user.profile).filter(complete=False).first()
-        cart_product_obj = CartProduct.objects.filter(
-            product__id=product_id).first()
+        cart_cart = Cart.objects.filter(customer=request.user.profile).filter(complete=False).first()
+        cart_product_obj = CartProduct.objects.filter(product__id=product_id).first()
 
         try:
             if cart_cart:
@@ -243,8 +241,7 @@ class AddtoCart(views.APIView):
                 this_product_in_cart = cart_cart.cartproduct_set.filter(
                     product=product_obj)
                 if this_product_in_cart.exists():
-                    cart_product_uct = CartProduct.objects.filter(product=product_obj).filter(
-                        cart__complete=False).first()
+                    cart_product_uct = CartProduct.objects.filter(product=product_obj).filter(cart__complete=False).first()
                     cart_product_uct.quantity += 1
                     cart_product_uct.subtotal += product_obj.selling_price
                     cart_product_uct.save()
@@ -267,8 +264,7 @@ class AddtoCart(views.APIView):
                     total=0,
                     complete=False
                 )
-                new_cart = Cart.objects.filter(
-                    customer=request.user.profile).filter(complete=False).first()
+                new_cart = Cart.objects.filter(customer=request.user.profile).filter(complete=False).first()
                 cart_product_new = CartProduct.objects.create(
                     cart=new_cart,
                     price=product_obj.selling_price,
@@ -278,12 +274,10 @@ class AddtoCart(views.APIView):
                 cart_product_new.product.add(product_obj)
                 new_cart.total += product_obj.selling_price
                 new_cart.save()
-            response_msg = {"error": False,
-                            "message": "Product is added to cart"}
+            response_msg = {"error": False,"message": "Product is added to cart"}
 
         except:
-            response_msg = {
-                "error": True, "message": "Product is not added to cart !! Try Again"}
+            response_msg = {"error": True, "message": "Product is not added to cart !! Try Again"}
 
         return Response(response_msg)
 
@@ -857,9 +851,9 @@ def sslc_status(request):
                     transaction_id=tran_id,
                     transaction_medium=medium
                 )
-                return redirect("https://bdmobileshop.netlify.app/success")
+                return redirect("http://localhost:8000/success")
         elif status == "FAILED":
-            return redirect("https://bdmobileshop.netlify.app/failed")
+            return redirect("http://localhost:8000/failed")
 
 
 def sslc_complete(request, val_id, tran_id, value_a, value_b, value_c, value_d):
